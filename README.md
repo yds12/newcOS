@@ -9,11 +9,11 @@ Clone the repository and `cd` to the project directory.
 
 Assemble:
 
-    $ nasm boot.asm
+    $ nasm -f bin -o boot.bin boot.asm
 
 Run the binary on `qemu`:
 
-    $ qemu-system-x86_64 -drive format=raw,file=boot
+    $ qemu-system-x86_64 -drive format=raw,file=boot.bin
 
 For now you should see a "welcome" message from our OS' bootloader.
 
