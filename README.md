@@ -3,17 +3,13 @@ Toy OS for learning purposes. Named after
 
 # Running
 
-You need a Linux machine with `nasm` and `qemu` installed.
+You need a Linux machine with `nasm`, `qemu` and `make` installed.
 
 Clone the repository and `cd` to the project directory.
 
-Assemble:
+Then run:
 
-    $ nasm -f bin -o boot.bin boot.asm
-
-Run the binary on `qemu`:
-
-    $ qemu-system-x86_64 -drive format=raw,file=boot.bin
+    $ make
 
 For now you should see a "welcome" message from our OS' bootloader.
 
