@@ -12,13 +12,6 @@ KERNEL_OFFSET equ 0x1000
 ; BOOT_DRIVE is being set to 128 (0x80) which is the common
 ; value for HDD
 
-; Idk what this does
-; maybe clearing segment registers
-;mov ax, cs
-;mov ds, ax
-;mov es, ax
-;mov ss, ax
-
 ; setup a temporary stack
 mov bp, 0x9000 ; 7c00
 mov sp, bp
@@ -113,21 +106,21 @@ disk_error_amount:
   jmp $
 
 check_kernel_mem:
-  mov bx, KERNEL_OFFSET
-  call mem_dump
-  jmp $
-
-  mov al, 0xe8
-  cmp al, [KERNEL_OFFSET]
-  jne .err
-  mov al, 0x02
-  cmp al, [KERNEL_OFFSET + 1]
-  jne .err
   ret
-.err:
-  mov si, msg_kernel_not_ok
-  call print
-  jmp $
+;  mov bx, KERNEL_OFFSET
+;  mov es, bx
+;  xor bx, bx
+;  mov al, 0xe8
+;  cmp al, [es:bx]
+;  jne .err
+;  mov al, 0x02
+;  cmp al, [es:bx + 1]
+;  jne .err
+;  ret
+;.err:
+;  mov si, msg_kernel_not_ok
+;  call print
+;  jmp $
 
 ; %include "gdt.asm"
 
@@ -245,7 +238,7 @@ msg_disk_reset_ok: db "OK1", 0x0a, 0x0d, 0
 msg_disk_err: db "ERR2", 0x0a, 0x0d, 0
 msg_disk_amount_err: db "ERR3", 0x0a, 0x0d, 0
 msg_disk_read_ok: db "OK2", 0x0a, 0x0d, 0
-msg_kernel_not_ok: db "ERR4", 0x0a, 0x0d, 0
+;msg_kernel_not_ok: db "ERR4", 0x0a, 0x0d, 0
 
 prepare32:
   cli                      ; disable BIOS interrupts
@@ -270,8 +263,13 @@ start32:
   mov ebp, 0x90000       ; setup another stack
   mov esp, ebp
 
-  call KERNEL_OFFSET     ; give control to Kernel
-  jmp $                  ; loop if kernel returns
+; The error was here:
+; since now we are in a flat memory mode,
+; an address xxx:0x0000 becomes xxx*16
+; (the real memory address is the value of the segment multiplied by 
+; 16 and added to the offset)
+  call KERNEL_OFFSET * 16  ; give control to Kernel
+  jmp $                    ; loop if kernel returns
 
 ;BOOT_DRIVE db 0
 

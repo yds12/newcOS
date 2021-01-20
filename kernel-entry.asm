@@ -13,7 +13,7 @@ bits 32
 ;mov word [es:0x0000], ax 
 ;jmp $
 
-extern kernel_main 
-call kernel_main 
+extern kmain
+call kmain
 jmp $
 
