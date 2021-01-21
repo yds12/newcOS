@@ -11,6 +11,7 @@ Then run:
 
     $ make
 
-For now you should see a "welcome" message from our OS' bootloader.
+For now you should see a message from our kernel.
 
 ![NewcOS screenshot](/docs/screenshot.png?raw=true)
+
