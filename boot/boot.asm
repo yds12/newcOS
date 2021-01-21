@@ -30,15 +30,14 @@ jmp $ ; infinite loop
 %include "boot/print.asm"
 
 prepare32:
-  cli                      ; disable BIOS interrupts
-  lgdt [gdt_descriptor]    ; load GDT
+  cli                    ; disable BIOS interrupts
+  lgdt [gdt_descriptor]  ; load GDT
 
-  ; enable protected mode
-  mov eax, cr0
+  mov eax, cr0           ; enable protected mode
   or  al, 1
   mov cr0, eax
 
-  jmp CODE_SEG:start32  ; far jump
+  jmp CODE_SEG:start32   ; far jump
 
 ; from here on, 32 bit instructions
 bits 32
