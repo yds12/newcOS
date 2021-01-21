@@ -1,18 +1,10 @@
+#include "drivers/ioports.h"
+
 #define VIDEO_MEM_ADD 0xb8000
 #define VGA_CTRL_REG 0x3d4
 #define VGA_DATA_REG 0x3d5
 #define VGA_OFFSET_LO 0x0f
 #define VGA_OFFSET_HI 0x0e
-
-unsigned char port_byte_in(unsigned short port) {
-  unsigned char result;
-  __asm__("in %%dx, %%al" : "=a" (result) : "d" (port));
-  return result;
-}
-
-void port_byte_out(unsigned short port, unsigned char data) {
-  __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
-}
 
 void set_cursor(short offset) {
   port_byte_out(VGA_CTRL_REG, VGA_OFFSET_HI);
