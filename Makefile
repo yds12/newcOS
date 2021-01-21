@@ -13,7 +13,7 @@ run: $(BDIR)newcos
 $(BDIR)newcos: $(BDIR)boot.bin $(BDIR)kernel.bin
 	cat $^ > $@
 
-$(BDIR)boot.bin: boot/boot.asm
+$(BDIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
 	nasm -f bin -o $@ $<
 
 $(BDIR)kernel.bin: $(BDIR)kernel-entry.o $(BDIR)kernel.o
