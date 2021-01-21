@@ -1,44 +1,26 @@
-bits 16
-org 0x7c00
+bits 16      ; 16 bit instructions
+org 0x7c00   ; assume program will be loaded here
 
-; where to load the Kernel to
+; address where the kernel should be loaded in memory
+; (this will go to the segment register, so the actual
+; address is this times 16)
 KERNEL_OFFSET equ 0x1000
-;KERNEL_OFFSET equ 0x9c00
 
-; BIOS set the boot drive in dl, store for later
-;mov [BOOT_DRIVE], dl
-
-; DEBUG
-; BOOT_DRIVE is being set to 128 (0x80) which is the common
-; value for HDD
-
-; setup a temporary stack
-mov bp, 0x9000 ; 7c00
+; setup a temporary stack (for push, call, ret, etc.)
+mov bp, 0x9000
 mov sp, bp
 
 ; setup video mode
 mov ah, 0x00
 mov al, 0x03      ; 80x25 text
-int 0x10
-
-;mov bx, 0x7c00
-;call mem_dump
-;jmp $
+int 0x10          ; BIOS interrupt
 
 ; print welcome msg
 mov si, msg_hello
 call print
 
-; DEBUG (write to video)
-;mov ax, 0xb800
-;mov es, ax
-;mov ax, 0x4061
-;mov word [es:0x0000], ax 
-;jmp $
-
 ; reset disk
 xor ah, ah
-;mov dl, [BOOT_DRIVE]
 int 0x13
 jc reset_error 
 jmp ok
@@ -49,48 +31,34 @@ reset_error:
   jmp $
 
 ok:
-;  mov si, msg_disk_reset_ok
-;  call print
+  mov si, msg_disk_reset_ok
+  call print
 
-; load Kernel
-;mov dl, [BOOT_DRIVE]   ; store boot drive in dl
+; Read the kernel from the disk
 
-; disk load
-;pusha
-;push dx
+; dl should be the drive number
+; dl is being set by the BIOS to 128 (0x80) which
+; is the common value for HDD
 
 mov ah, 0x02   ; read mode
 mov al, 0x01   ; number of sectors to read
 mov ch, 0x00   ; cylinder 0
 mov cl, 0x02   ; sector 2 (sector 1 is the boot sector)
 mov dh, 0x00   ; head 0
-mov bx, KERNEL_OFFSET  ; bx is destination
+
+; es:bx should be a pointer to the buffer where to store the read content
+mov bx, KERNEL_OFFSET
 mov es, bx
 xor bx, bx     ; KERNEL_OFFSET:0x0000
 
-; dl should be the drive number
-; es:bx should be a pointer to the buffer where to store the read content
-
 int 0x13       ; BIOS interrupt: read disk
-
-; DEBUG
-; this interrupt is resulting in error (carry flag set)
-; and the return code (in ah) is 12 (0x0C = media type not found)
-
 jc disk_error  ; error will set the carry (jc = jump if carry)
 
-;pop dx         ; get back the number of sectors to read
-cmp al, 0x01 ;dh     ; compare with al (sectors read)
-
+cmp al, 0x01          ; compare with al (sectors read) with desired number
 jne disk_error_amount ; if not equal, error
-;popa
 
 mov si, msg_disk_read_ok
 call print
-call check_kernel_mem
-
-; DEBUG
-;jmp KERNEL_OFFSET:0x0000
 
 call prepare32
 jmp $ ; infinite loop
@@ -104,25 +72,6 @@ disk_error_amount:
   mov si, msg_disk_amount_err
   call print
   jmp $
-
-check_kernel_mem:
-  ret
-;  mov bx, KERNEL_OFFSET
-;  mov es, bx
-;  xor bx, bx
-;  mov al, 0xe8
-;  cmp al, [es:bx]
-;  jne .err
-;  mov al, 0x02
-;  cmp al, [es:bx + 1]
-;  jne .err
-;  ret
-;.err:
-;  mov si, msg_kernel_not_ok
-;  call print
-;  jmp $
-
-; %include "gdt.asm"
 
 ; GDT: global descriptor table
 ; we are using a GDT with a null descriptor plus a code and a data segment,
@@ -171,74 +120,13 @@ print:
 .end:
   ret
 
-print_byte: ; byte in al
-  push ax
-  lea bx, [chars]
-  and ax, 0x00F0
-  shr ax, 4
-  mov si, ax
-  mov al, byte [bx + si]
-  mov ah, 0x0e
-  int 0x10
-  pop ax
-  and ax, 0x000F
-  mov si, ax
-  mov al, byte [bx + si]
-  mov ah, 0x0e
-  int 0x10
-  ret
-
-mem_dump:  ; address in bx
-  mov di, 0
-  mov es, bx
-.loop:
-  xor bx, bx
-  mov al, byte [es:bx + di]
-  call print_byte
-  inc di
-  xor bx, bx
-  mov al, byte [es:bx + di]
-  call print_byte
-  inc di
-  mov ah, 0x0e
-  mov al, " "
-  int 0x10
-  cmp di, 512
-  jne .loop
-  ret
-
-mem_dump_no_seg:  ; address in bx
-  mov di, 0
-.loop:
-  mov es, bx
-  xor bx, bx
-  mov al, byte [es:bx + di]
-  push bx
-  call print_byte
-  pop bx
-  inc di
-  xor bx, bx
-  mov al, byte [es:bx + di]
-  push bx
-  call print_byte
-  pop bx
-  inc di
-  mov ah, 0x0e
-  mov al, " "
-  int 0x10
-  cmp di, 512
-  jne .loop
-  ret
-
-
 chars: db "0123456789ABCDEF"
-msg_hello: db "== NewcOS ==", 0x0a, 0x0a, 0x0d, 0
-msg_disk_reset_err: db "ERR1", 0x0a, 0x0d, 0
-msg_disk_reset_ok: db "OK1", 0x0a, 0x0d, 0
-msg_disk_err: db "ERR2", 0x0a, 0x0d, 0
-msg_disk_amount_err: db "ERR3", 0x0a, 0x0d, 0
-msg_disk_read_ok: db "OK2", 0x0a, 0x0d, 0
-;msg_kernel_not_ok: db "ERR4", 0x0a, 0x0d, 0
+msg_hello: db "> NewcOS booting...", 0x0a, 0x0d, 0
+msg_disk_reset_err: db "> Error reseting disk.", 0x0a, 0x0d, 0
+msg_disk_reset_ok: db "> Disk successfully reset.", 0x0a, 0x0d, 0
+msg_disk_err: db "> Disk error.", 0x0a, 0x0d, 0
+msg_disk_amount_err: db "> Could not read all required sectors.", 0x0a, 0x0d, 0
+msg_disk_read_ok: db "> Disk successfully read.", 0x0a, 0x0d, 0
 
 prepare32:
   cli                      ; disable BIOS interrupts
@@ -251,6 +139,7 @@ prepare32:
 
   jmp CODE_SEG:start32  ; far jump
 
+; from here on, 32 bit instructions
 bits 32
 start32:
   mov ax, DATA_SEG       ; update segment registers
@@ -263,15 +152,12 @@ start32:
   mov ebp, 0x90000       ; setup another stack
   mov esp, ebp
 
-; The error was here:
-; since now we are in a flat memory mode,
+; Since now we are in a flat memory mode,
 ; an address xxx:0x0000 becomes xxx*16
 ; (the real memory address is the value of the segment multiplied by 
 ; 16 and added to the offset)
   call KERNEL_OFFSET * 16  ; give control to Kernel
   jmp $                    ; loop if kernel returns
-
-;BOOT_DRIVE db 0
 
 ; padding
 times (510 - ($ - $$)) db 0   ; $: current offset
