@@ -2,24 +2,29 @@
 # $< means the first dependency (after the rule name)
 # $^ means all dependencies
 
-run: newcos.bin
-	qemu-system-x86_64 -drive format=raw,file=$<
+BDIR = build/
+QEMU = qemu-system-x86_64
+CC = gcc
+CFLAGS = -m32 -fno-pic -ffreestanding
 
-newcos.bin: boot.bin kernel.bin
+run: $(BDIR)newcos
+	$(QEMU) -drive format=raw,file=$<
+
+$(BDIR)newcos: $(BDIR)boot.bin $(BDIR)kernel.bin
 	cat $^ > $@
 
-boot.bin: boot.asm
+$(BDIR)boot.bin: boot/boot.asm
 	nasm -f bin -o $@ $<
 
-kernel.bin: kernel-entry.o kernel.o
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
+$(BDIR)kernel.bin: $(BDIR)kernel-entry.o $(BDIR)kernel.o
+	ld -m elf_i386 --oformat binary -Ttext 0x1000 -o $@ $^
 
-kernel-entry.o: kernel-entry.asm
+$(BDIR)kernel-entry.o: boot/kernel-entry.asm
 	nasm -f elf -o $@ $<
 
-kernel.o: kernel.c
-	gcc -m32 -fno-pic -ffreestanding -c $< -o $@
+$(BDIR)kernel.o: kernel/kernel.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm *.bin *.o
+	rm build/*
 

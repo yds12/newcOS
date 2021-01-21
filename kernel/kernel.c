@@ -1,5 +1,5 @@
 void kmain() {
-  short offset = 80 * 5;
+  short offset = 80 * 3;
   char text[27] = "> Hello from NewcOS kernel!";
   char color = 0xE1;
   char* video_mem = (char*) 0xb8000;
