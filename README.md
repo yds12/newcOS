@@ -13,3 +13,4 @@ Then run:
 
 For now you should see a "welcome" message from our OS' bootloader.
 
+![NewcOS screenshot](/docs/screenshot.png?raw=true)
