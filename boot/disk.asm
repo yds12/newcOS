@@ -19,8 +19,13 @@ ok:
 ; dl is being set by the BIOS to 128 (0x80) which
 ; is the common value for HDD
 
+; Whenever our image size increses, we have to increase this
+; to the right size. We need to find a better way to do this.
+; We can probably generate an image with some padding to a fixed size.
+IMG_NUM_SECTORS equ 0x03
+
 mov ah, 0x02   ; read mode
-mov al, 0x01   ; number of sectors to read
+mov al, IMG_NUM_SECTORS  ; number of sectors to read
 mov ch, 0x00   ; cylinder 0
 mov cl, 0x02   ; sector 2 (sector 1 is the boot sector)
 mov dh, 0x00   ; head 0
@@ -33,7 +38,7 @@ xor bx, bx     ; KERNEL_OFFSET:0x0000
 int 0x13       ; BIOS interrupt: read disk
 jc disk_error  ; error will set the carry (jc = jump if carry)
 
-cmp al, 0x01          ; compare with al (sectors read) with desired number
+cmp al, IMG_NUM_SECTORS  ; compare with al (sectors read) with desired number
 jne disk_error_amount ; if not equal, error
 
 mov si, msg_disk_read_ok
