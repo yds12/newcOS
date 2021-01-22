@@ -1,4 +1,5 @@
 #include "drivers/ioports.h"
+#include "kernel/interrupt.h"
 
 #define VIDEO_MEM_ADD 0xb8000
 #define VGA_CTRL_REG 0x3d4
@@ -36,6 +37,8 @@ void kmain() {
   short cursor = get_cursor();
   set_cursor(cursor + 1);
 
+  isr_setup();
+  asm volatile("sti");  // enable external interrupts
   while(1);
 }
 

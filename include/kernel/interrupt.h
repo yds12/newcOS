@@ -27,7 +27,7 @@ typedef struct {
   uint32_t eip, cs, eflags, useresp, ss;            // pushed automatically
 } registers;
 
-void set_idtgate(int n, uint32_t handler);
+void set_idt_gate(int n, uint32_t handler);
 void load_idt();
 void isr_setup();
 

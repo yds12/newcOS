@@ -1,8 +1,12 @@
 #include <stdint.h>
 #include "kernel/interrupt.h"
+#include "drivers/ioports.h"
 
 #define lo16(addr) (uint16_t)((addr) & 0xffff)
 #define hi16(addr) (uint16_t)(((addr) >> 16) & 0xffff)
+
+idt_gate idt[256];
+idt_register idt_reg;
 
 void isr_handler(registers* r) {
   // r->int_num for interrupt number
@@ -16,9 +20,13 @@ void irq_handler(registers* r) {
   char* vmem = (char*) 0xb8000;
   vmem[80 * 8 * 2] = '*';
   vmem[80 * 8 * 2 + 1] = 0xe1;
-}
 
-idt_gate idt[256];
+  // Send an End of Interrupt (EOI) to PICs
+  port_byte_out(0x20, 0x20); // primary PIC EOI
+  if(r->int_num < 40) {
+    port_byte_out(0xa0, 0x20); // secondary PIC EOI
+  }
+}
 
 void set_idt_gate(int gate_num, uint32_t handler) {
   idt[gate_num].low_offset = lo16(handler);
@@ -26,6 +34,12 @@ void set_idt_gate(int gate_num, uint32_t handler) {
   idt[gate_num].filler = 0;
   idt[gate_num].flags = 0x8e; // 1 00 0 1 110 (P DPL 0 D type)
   idt[gate_num].high_offset = hi16(handler);
+}
+
+void load_idt() {
+  idt_reg.base = (uint32_t) &idt;
+  idt_reg.limit = IDT_ENTRIES * sizeof(idt_gate) - 1;
+  asm volatile("lidt (%0)" : : "r" (&idt_reg));
 }
 
 void isr_setup() {
@@ -66,23 +80,23 @@ void isr_setup() {
   // PIC remapping
   // Initialize Command Word (ICW) 1
   port_byte_out(0x20, 0x11);
-  port_byte_out(0xA0, 0x11);
+  port_byte_out(0xa0, 0x11);
 
   // ICW2
   port_byte_out(0x21, 0x20);
-  port_byte_out(0xA1, 0x28);
+  port_byte_out(0xa1, 0x28);
 
   // ICW3
   port_byte_out(0x21, 0x04);
-  port_byte_out(0xA1, 0x02);
+  port_byte_out(0xa1, 0x02);
 
   // ICW4
   port_byte_out(0x21, 0x01);
-  port_byte_out(0xA1, 0x01);
+  port_byte_out(0xa1, 0x01);
 
   // Operational Command Word (OCW) 1
   port_byte_out(0x21, 0);
-  port_byte_out(0xA1, 0);
+  port_byte_out(0xa1, 0);
 
   // IRQ ISRs (primary PIC)
   set_idt_gate(32, (uint32_t) irq0);
@@ -103,5 +117,7 @@ void isr_setup() {
   set_idt_gate(45, (uint32_t) irq13);
   set_idt_gate(46, (uint32_t) irq14);
   set_idt_gate(47, (uint32_t) irq15);
+
+  load_idt();
 }
 
