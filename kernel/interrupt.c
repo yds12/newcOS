@@ -29,6 +29,7 @@ void set_idt_gate(int gate_num, uint32_t handler) {
 }
 
 void isr_setup() {
+  // Internal ISRs
   set_idt_gate(0, (uint32_t) isr0);
   set_idt_gate(1, (uint32_t) isr1);
   set_idt_gate(2, (uint32_t) isr2);
@@ -62,6 +63,7 @@ void isr_setup() {
   set_idt_gate(30, (uint32_t) isr30);
   set_idt_gate(31, (uint32_t) isr31);
 
+  // PIC remapping
   // Initialize Command Word (ICW) 1
   port_byte_out(0x20, 0x11);
   port_byte_out(0xA0, 0x11);
@@ -81,5 +83,25 @@ void isr_setup() {
   // Operational Command Word (OCW) 1
   port_byte_out(0x21, 0);
   port_byte_out(0xA1, 0);
+
+  // IRQ ISRs (primary PIC)
+  set_idt_gate(32, (uint32_t) irq0);
+  set_idt_gate(33, (uint32_t) irq1);
+  set_idt_gate(34, (uint32_t) irq2);
+  set_idt_gate(35, (uint32_t) irq3);
+  set_idt_gate(36, (uint32_t) irq4);
+  set_idt_gate(37, (uint32_t) irq5);
+  set_idt_gate(38, (uint32_t) irq6);
+  set_idt_gate(39, (uint32_t) irq7);
+
+  // IRQ ISRs (secondary PIC)
+  set_idt_gate(40, (uint32_t) irq8);
+  set_idt_gate(41, (uint32_t) irq9);
+  set_idt_gate(42, (uint32_t) irq10);
+  set_idt_gate(43, (uint32_t) irq11);
+  set_idt_gate(44, (uint32_t) irq12);
+  set_idt_gate(45, (uint32_t) irq13);
+  set_idt_gate(46, (uint32_t) irq14);
+  set_idt_gate(47, (uint32_t) irq15);
 }
 
