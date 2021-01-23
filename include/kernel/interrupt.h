@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #define KERNEL_SEG 0x08
-#define IDT_ENTRIES 256
+#define IDT_ENTRIES 34 // 256 for fully populated
 
 // A interrupt gate (handler)
 typedef struct {
@@ -27,9 +27,9 @@ typedef struct {
   uint32_t eip, cs, eflags, useresp, ss;            // pushed automatically
 } registers;
 
+void idt_setup();
 void set_idt_gate(int n, uint32_t handler);
 void load_idt();
-void isr_setup();
 
 extern void isr0();
 extern void isr1();

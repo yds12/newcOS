@@ -5,7 +5,17 @@
 #define lo16(addr) (uint16_t)((addr) & 0xffff)
 #define hi16(addr) (uint16_t)(((addr) >> 16) & 0xffff)
 
-idt_gate idt[256];
+// ports:
+// 0x20 primary PIC (PIC1) command and status register
+#define PIC1_CTRL 0x20
+// 0xA0 secondary PIC (PIC2) comm. and status reg.
+#define PIC2_CTRL 0xa0
+// 0x21 PIC1 interrupt mask reg. and data reg.
+#define PIC1_DATA 0x21
+// 0xA1 PIC2 int. mask reg. and data reg.
+#define PIC2_DATA 0xa1
+
+idt_gate idt[IDT_ENTRIES]; // 256 for fully populated
 idt_register idt_reg;
 
 void isr_handler(registers* r) {
@@ -22,9 +32,9 @@ void irq_handler(registers* r) {
   vmem[80 * 8 * 2 + 1] = 0xe1;
 
   // Send an End of Interrupt (EOI) to PICs
-  port_byte_out(0x20, 0x20); // primary PIC EOI
+  port_byte_out(PIC1_CTRL, 0x20); // primary PIC EOI
   if(r->int_num < 40) {
-    port_byte_out(0xa0, 0x20); // secondary PIC EOI
+    port_byte_out(PIC2_CTRL, 0x20); // secondary PIC EOI
   }
 }
 
@@ -42,8 +52,39 @@ void load_idt() {
   asm volatile("lidt (%0)" : : "r" (&idt_reg));
 }
 
-void isr_setup() {
-  // Internal ISRs
+void pic_remap() {
+  // Initialize Command Word (ICW) 1
+  port_byte_out(PIC1_CTRL, 0x11); // init PIC1, expect ICW4
+  port_byte_out(PIC2_CTRL, 0x11); // init PIC2, expect ICW4
+
+  // ICW2
+  // Here we map which blocks of the IDT will be mapped
+  // to each of the PICs. Entries 0 to 31 are reserved, so:
+  port_byte_out(PIC1_DATA, 0x20); // set IDT offset to 32 for PIC1
+  port_byte_out(PIC2_DATA, 0x28); // set IDT offset to 40 for PIC2
+
+  // ICW3
+  // For PIC1, we must send 8 bits, all 0s and 1 in the bit
+  // position representing the line that will connect to PIC2
+  // in this case, line IR2 which is bit 2, so 0100 = 0x04
+  port_byte_out(PIC1_DATA, 0x04);
+  // For PIC2 we just send a 3 bit number representing the
+  // number of the line, in this case IR2 so 10 in binary (0x02)
+  port_byte_out(PIC2_DATA, 0x02); // redirection to IRQ2
+
+  // ICW4
+  port_byte_out(PIC1_DATA, 0x01); // enables 80x86 mode (?)
+  port_byte_out(PIC2_DATA, 0x01);
+
+  // Operational Command Word (OCW) 1
+  //port_byte_out(PIC1_DATA, 0); // all done, clear data
+  //port_byte_out(PIC2_DATA, 0);
+  port_byte_out(PIC1_DATA, 0xfd); // only IRQ1 (keyboard)
+  port_byte_out(PIC2_DATA, 0xff);
+}
+
+void idt_setup() {
+  // Internal ISRs (CPU exceptions)
   set_idt_gate(0, (uint32_t) isr0);
   set_idt_gate(1, (uint32_t) isr1);
   set_idt_gate(2, (uint32_t) isr2);
@@ -77,30 +118,13 @@ void isr_setup() {
   set_idt_gate(30, (uint32_t) isr30);
   set_idt_gate(31, (uint32_t) isr31);
 
-  // PIC remapping
-  // Initialize Command Word (ICW) 1
-  port_byte_out(0x20, 0x11);
-  port_byte_out(0xa0, 0x11);
-
-  // ICW2
-  port_byte_out(0x21, 0x20);
-  port_byte_out(0xa1, 0x28);
-
-  // ICW3
-  port_byte_out(0x21, 0x04);
-  port_byte_out(0xa1, 0x02);
-
-  // ICW4
-  port_byte_out(0x21, 0x01);
-  port_byte_out(0xa1, 0x01);
-
-  // Operational Command Word (OCW) 1
-  port_byte_out(0x21, 0);
-  port_byte_out(0xa1, 0);
+  pic_remap();
 
   // IRQ ISRs (primary PIC)
   set_idt_gate(32, (uint32_t) irq0);
   set_idt_gate(33, (uint32_t) irq1);
+  /*
+  // for now we just need IRQ1 = keyboard
   set_idt_gate(34, (uint32_t) irq2);
   set_idt_gate(35, (uint32_t) irq3);
   set_idt_gate(36, (uint32_t) irq4);
@@ -117,6 +141,7 @@ void isr_setup() {
   set_idt_gate(45, (uint32_t) irq13);
   set_idt_gate(46, (uint32_t) irq14);
   set_idt_gate(47, (uint32_t) irq15);
+  */
 
   load_idt();
 }

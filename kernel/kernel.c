@@ -37,8 +37,8 @@ void kmain() {
   short cursor = get_cursor();
   set_cursor(cursor + 1);
 
-  isr_setup();
+  idt_setup();
   asm volatile("sti");  // enable external interrupts
-  while(1);
+  while(1) asm("hlt");
 }
 

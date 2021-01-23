@@ -7,6 +7,7 @@ QEMU = qemu-system-x86_64
 CC = gcc
 CFLAGS = -m32 -fno-pic -ffreestanding -I include
 
+# -d guest_errors,int
 run: $(BDIR)newcos
 	$(QEMU) -d guest_errors,int -drive format=raw,file=$<
 
