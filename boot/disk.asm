@@ -22,7 +22,7 @@ ok:
 ; Whenever our image size increses, we have to increase this
 ; to the right size. We need to find a better way to do this.
 ; We can probably generate an image with some padding to a fixed size.
-IMG_NUM_SECTORS equ 0x05
+IMG_NUM_SECTORS equ 0x06
 
 mov ah, 0x02   ; read mode
 mov al, IMG_NUM_SECTORS  ; number of sectors to read

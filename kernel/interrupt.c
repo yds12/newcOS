@@ -15,7 +15,7 @@
 // 0xA1 PIC2 int. mask reg. and data reg.
 #define PIC2_DATA 0xa1
 
-idt_gate idt[IDT_ENTRIES]; // 256 for fully populated
+idt_gate idt[IDT_ENTRIES];
 idt_register idt_reg;
 
 void isr_handler(registers* r) {
