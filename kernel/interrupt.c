@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "kernel/interrupt.h"
 #include "drivers/ioports.h"
+#include "drivers/vga.h"
 
 #define lo16(addr) (uint16_t)((addr) & 0xffff)
 #define hi16(addr) (uint16_t)(((addr) >> 16) & 0xffff)
@@ -19,17 +20,13 @@ idt_gate idt[IDT_ENTRIES];
 idt_register idt_reg;
 
 void isr_handler(registers* r) {
-  // r->int_num for interrupt number
-  char* vmem = (char*) 0xb8000;
-  vmem[80 * 7 * 2] = '+';
-  vmem[80 * 7 * 2 + 1] = 0xe1;
+  println("ISR handler:");
+  print_byte((uint8_t) r->int_num);
 }
 
 void irq_handler(registers* r) {
-  // r->int_num for interrupt number
-  char* vmem = (char*) 0xb8000;
-  vmem[80 * 8 * 2] = '*';
-  vmem[80 * 8 * 2 + 1] = 0xe1;
+  println("IRQ handler:");
+  print_byte((uint8_t) r->int_num);
 
   // Send an End of Interrupt (EOI) to PICs
   port_byte_out(PIC1_CTRL, 0x20); // primary PIC EOI
