@@ -57,6 +57,11 @@ void newline() {
   set_cursor(cursor + (VGA_COLS - (cursor % VGA_COLS)));
 }
 
+void* print_addr(void* ptr) {
+  memdump(&ptr, 4);
+  return ptr;
+}
+
 void println(char* text) {
   char color = 0xE1;
   short cursor = get_cursor();

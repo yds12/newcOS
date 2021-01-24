@@ -6,6 +6,9 @@ org 0x7c00   ; assume program will be loaded here
 ; address is this times 16)
 KERNEL_OFFSET equ 0x1000
 
+; Address for the stack we will create before entering the kernel
+STACK_ADDR equ 0x90000
+
 ; setup a temporary stack (for push, call, ret, etc.)
 mov bp, 0x9000
 mov sp, bp
@@ -49,7 +52,7 @@ start32:
   mov fs, ax
   mov gs, ax
 
-  mov ebp, 0x90000       ; setup another stack
+  mov ebp, STACK_ADDR    ; setup another stack
   mov esp, ebp
 
 ; Since now we are in a flat memory mode,

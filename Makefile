@@ -19,7 +19,7 @@ $(BDIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
 
 $(BDIR)kernel.bin: $(BDIR)kernel-entry.o $(BDIR)kernel.o $(BDIR)ioports.o $(BDIR)interrupt.o \
     $(BDIR)vga.o
-	ld -m elf_i386 --oformat binary -Ttext 0x1000 -o $@ $^
+	ld -m elf_i386 --oformat binary -Ttext 0x10000 -o $@ $^
 
 $(BDIR)kernel-entry.o: boot/kernel-entry.asm
 	nasm -f elf -o $@ $<
