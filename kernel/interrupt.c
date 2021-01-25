@@ -26,8 +26,6 @@ void isr_handler(registers* r) {
 }
 
 void irq_handler(registers* r) {
-  println("IRQ handler:");
-
   // Keyboard: IRQ1
   if(r->int_num == 33) handle_kb();
 

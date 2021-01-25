@@ -62,6 +62,20 @@ void* print_addr(void* ptr) {
   return ptr;
 }
 
+void print(char* text) {
+  char color = 0xE1;
+  short cursor = get_cursor();
+  char* video_mem = (char*) VIDEO_MEM_ADDR;
+
+  short i = 0;
+  for(; text[i] != 0; i++) {
+    video_mem[cursor * 2 + i * 2] = text[i];
+    video_mem[cursor * 2 + i * 2 + 1] = color;
+  }
+
+  set_cursor(cursor + i);
+}
+
 void println(char* text) {
   char color = 0xE1;
   short cursor = get_cursor();
