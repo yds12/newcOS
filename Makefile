@@ -13,6 +13,7 @@ run: $(BDIR)newcos
 
 $(BDIR)newcos: $(BDIR)boot.bin $(BDIR)kernel.bin
 	cat $^ > $@
+	truncate -s 48K $(BDIR)newcos
 
 $(BDIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
 	nasm -f bin -o $@ $<

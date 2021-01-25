@@ -19,10 +19,9 @@ ok:
 ; dl is being set by the BIOS to 128 (0x80) which
 ; is the common value for HDD
 
-; Whenever our image size increses, we have to increase this
-; to the right size. We need to find a better way to do this.
-; We can probably generate an image with some padding to a fixed size.
-IMG_NUM_SECTORS equ 0x06
+; We are now padding the image to 48KB of size, so we can
+; read 0x5F sectors without causing errors (0x6 - 1 for the boot sector).
+IMG_NUM_SECTORS equ 0x5E ; almost 48KB
 
 mov ah, 0x02   ; read mode
 mov al, IMG_NUM_SECTORS  ; number of sectors to read
