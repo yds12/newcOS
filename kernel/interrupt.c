@@ -1,7 +1,8 @@
 #include <stdint.h>
 #include "kernel/interrupt.h"
-#include "drivers/ioports.h"
-#include "drivers/vga.h"
+#include "driver/ioport.h"
+#include "driver/vga.h"
+#include "driver/keyboard.h"
 
 #define lo16(addr) (uint16_t)((addr) & 0xffff)
 #define hi16(addr) (uint16_t)(((addr) >> 16) & 0xffff)
@@ -27,48 +28,8 @@ void isr_handler(registers* r) {
 void irq_handler(registers* r) {
   println("IRQ handler:");
 
-  if(r->int_num == 33) { // keyboard: IRQ1
-    uint8_t scancode = port_byte_in(0x60);
-
-    switch(scancode) {
-      case 0x0: println("ERROR");
-        break;
-      case 0x1: println("ESC");
-        break;
-      case 0x2: println("1");
-        break;
-      case 0x3: println("2");
-        break;
-      case 0x4: println("3");
-        break;
-      case 0x5: println("4");
-        break;
-      case 0x6: println("5");
-        break;
-      case 0x7: println("6");
-        break;
-      case 0x8: println("7");
-        break;
-      case 0x9: println("8");
-        break;
-      case 0xA: println("9");
-        break;
-      case 0xB: println("0");
-        break;
-      case 0x1E: println("A");
-        break;
-      case 0x39: println("SPACE");
-        break;
-      default:
-        if(scancode < 0x80) println("Unknown key down");
-        else if(scancode <= 0x39 + 0x80) {
-          println("Some key up");
-          print_byte(scancode - 0x80); // key up is key down + 0x80
-        } else println("Unknown key up");
-        break;
-    }
-    newline();
-  }
+  // Keyboard: IRQ1
+  if(r->int_num == 33) handle_kb();
 
   // Send an End of Interrupt (EOI) to PICs
   port_byte_out(PIC1_CTRL, 0x20); // primary PIC EOI

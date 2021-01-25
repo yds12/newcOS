@@ -2,39 +2,42 @@
 # $< means the first dependency (after the rule name)
 # $^ means all dependencies
 
-BDIR = build/
+ODIR = build/
 QEMU = qemu-system-x86_64
 CC = gcc
 CFLAGS = -m32 -fno-pic -ffreestanding -I include
 
 # -d guest_errors,int
-run: $(BDIR)newcos
+run: $(ODIR)newcos
 	$(QEMU) -drive format=raw,file=$<
 
-$(BDIR)newcos: $(BDIR)boot.bin $(BDIR)kernel.bin
+$(ODIR)newcos: $(ODIR)boot.bin $(ODIR)kernel.bin
 	cat $^ > $@
-	truncate -s 48K $(BDIR)newcos
+	truncate -s 48K $(ODIR)newcos
 
-$(BDIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
+$(ODIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
 	nasm -f bin -o $@ $<
 
-$(BDIR)kernel.bin: $(BDIR)kernel-entry.o $(BDIR)kernel.o $(BDIR)ioports.o $(BDIR)interrupt.o \
-    $(BDIR)vga.o
+$(ODIR)kernel.bin: $(ODIR)kernel-entry.o $(ODIR)kernel.o $(ODIR)ioport.o $(ODIR)interrupt.o \
+    $(ODIR)vga.o $(ODIR)keyboard.o
 	ld -m elf_i386 --oformat binary -Ttext 0x10000 -o $@ $^
 
-$(BDIR)kernel-entry.o: boot/kernel-entry.asm
+$(ODIR)kernel-entry.o: boot/kernel-entry.asm
 	nasm -f elf -o $@ $<
 
-$(BDIR)kernel.o: kernel/kernel.c
+$(ODIR)kernel.o: kernel/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BDIR)ioports.o: drivers/ioports.c
+$(ODIR)interrupt.o: kernel/interrupt.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BDIR)vga.o: drivers/vga.c
+$(ODIR)ioport.o: driver/ioport.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BDIR)interrupt.o: kernel/interrupt.c
+$(ODIR)vga.o: driver/vga.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(ODIR)keyboard.o: driver/keyboard.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

@@ -1,5 +1,5 @@
-#include "drivers/vga.h"
-#include "drivers/ioports.h"
+#include "driver/vga.h"
+#include "driver/ioport.h"
 
 #define VIDEO_MEM_ADDR 0xb8000
 #define VGA_CTRL_REG 0x3d4

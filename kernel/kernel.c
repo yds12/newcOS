@@ -1,5 +1,5 @@
 #include "util.h"
-#include "drivers/vga.h"
+#include "driver/vga.h"
 #include "kernel/interrupt.h"
 
 void kmain() {
