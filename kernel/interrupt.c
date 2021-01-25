@@ -21,7 +21,7 @@ idt_gate idt[IDT_ENTRIES];
 idt_register idt_reg;
 
 void isr_handler(registers* r) {
-  println("ISR handler:");
+  print("ISR handler:\n");
   print_byte((uint8_t) r->int_num);
 }
 

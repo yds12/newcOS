@@ -4,7 +4,7 @@
 #include "kernel/interrupt.h"
 
 void kmain() {
-  println("> Hello from NewcOS kernel!");
+  print("> Hello from NewcOS kernel!\n");
 
   idt_setup();
   asm volatile("sti");  // enable external interrupts

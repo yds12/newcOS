@@ -4,6 +4,11 @@
 #include "util.h"
 
 #define KB_PORT_IN 0x60
+#define KEYUP_OFFSET 0x80
+
+#define IS_SHIFT_SET (kb_state & MASK_SHIFT)
+#define IS_CTRL_SET (kb_state & MASK_CTRL)
+#define IS_SPECIAL_SET (kb_state & MASK_SPECIAL)
 
 #define SCANCODE_ERROR 0x0
 #define SCANCODE_ESC 0x1
@@ -95,63 +100,103 @@ void init_kb() {
   kb_state = 0;
 }
 
-void print_keyname(uint8_t scancode) {
+void register_char(char ch) {
+  printch(ch);
+}
+
+void process_scancode(uint8_t scancode) {
   char done = 1;
+
+  if(IS_SHIFT_SET) {
+    switch(scancode) {
+      case SCANCODE_A: register_char('A'); break;
+      case SCANCODE_B: register_char('B'); break;
+      case SCANCODE_C: register_char('C'); break;
+      case SCANCODE_D: register_char('D'); break;
+      case SCANCODE_E: register_char('E'); break;
+      case SCANCODE_F: register_char('F'); break;
+      case SCANCODE_G: register_char('G'); break;
+      case SCANCODE_H: register_char('H'); break;
+      case SCANCODE_I: register_char('I'); break;
+      case SCANCODE_J: register_char('J'); break;
+      case SCANCODE_K: register_char('K'); break;
+      case SCANCODE_L: register_char('L'); break;
+      case SCANCODE_M: register_char('M'); break;
+      case SCANCODE_N: register_char('N'); break;
+      case SCANCODE_O: register_char('O'); break;
+      case SCANCODE_P: register_char('P'); break;
+      case SCANCODE_Q: register_char('Q'); break;
+      case SCANCODE_R: register_char('R'); break;
+      case SCANCODE_S: register_char('S'); break;
+      case SCANCODE_T: register_char('T'); break;
+      case SCANCODE_U: register_char('U'); break;
+      case SCANCODE_V: register_char('V'); break;
+      case SCANCODE_W: register_char('W'); break;
+      case SCANCODE_X: register_char('X'); break;
+      case SCANCODE_Y: register_char('Y'); break;
+      case SCANCODE_Z: register_char('Z'); break;
+      default: done = 0;
+        break;
+    }
+
+    if(done) return;
+  }
+
+  done = 1;
+
   switch(scancode) {
-    case SCANCODE_0: print("0"); break;
-    case SCANCODE_1: print("1"); break;
-    case SCANCODE_2: print("2"); break;
-    case SCANCODE_3: print("3"); break;
-    case SCANCODE_4: print("4"); break;
-    case SCANCODE_5: print("5"); break;
-    case SCANCODE_6: print("6"); break;
-    case SCANCODE_7: print("7"); break;
-    case SCANCODE_8: print("8"); break;
-    case SCANCODE_9: print("9"); break;
-    case SCANCODE_A:
-      if(kb_state & MASK_SHIFT) print("A");
-      else print("a");
-      break;
-    case SCANCODE_B: print("B"); break;
-    case SCANCODE_C: print("C"); break;
-    case SCANCODE_D: print("D"); break;
-    case SCANCODE_E: print("E"); break;
-    case SCANCODE_F: print("F"); break;
-    case SCANCODE_G: print("G"); break;
-    case SCANCODE_H: print("H"); break;
-    case SCANCODE_I: print("I"); break;
-    case SCANCODE_J: print("J"); break;
-    case SCANCODE_K: print("K"); break;
-    case SCANCODE_L: print("L"); break;
-    case SCANCODE_M: print("M"); break;
-    case SCANCODE_N: print("N"); break;
-    case SCANCODE_O: print("O"); break;
-    case SCANCODE_P: print("P"); break;
-    case SCANCODE_Q: print("Q"); break;
-    case SCANCODE_R: print("R"); break;
-    case SCANCODE_S: print("S"); break;
-    case SCANCODE_T: print("T"); break;
-    case SCANCODE_U: print("U"); break;
-    case SCANCODE_V: print("V"); break;
-    case SCANCODE_W: print("W"); break;
-    case SCANCODE_X: print("X"); break;
-    case SCANCODE_Y: print("Y"); break;
-    case SCANCODE_Z: print("Z"); break;
-    case SCANCODE_PLUS: print("+"); break;
-    case SCANCODE_MINUS: print("-"); break;
-    case SCANCODE_SEMI: print(";"); break;
-    case SCANCODE_LSQB: print("["); break;
-    case SCANCODE_RSQB: print("]"); break;
-    case SCANCODE_COMMA: print(","); break;
-    case SCANCODE_DOT: print("."); break;
-    case SCANCODE_SLASH: print("/"); break;
-    case SCANCODE_STAR: print("*"); break;
-    case SCANCODE_QUOT: print("'"); break;
-    case SCANCODE_BTCK: print("`"); break;
-    case SCANCODE_BSLASH: print("\\"); break;
-    case SCANCODE_SPACE: print("SPACE"); break;
-    case SCANCODE_TAB: print("TAB"); break;
-    case SCANCODE_ENTER: print("ENTER"); break;
+    case SCANCODE_0: register_char('0'); break;
+    case SCANCODE_1: register_char('1'); break;
+    case SCANCODE_2: register_char('2'); break;
+    case SCANCODE_3: register_char('3'); break;
+    case SCANCODE_4: register_char('4'); break;
+    case SCANCODE_5: register_char('5'); break;
+    case SCANCODE_6: register_char('6'); break;
+    case SCANCODE_7: register_char('7'); break;
+    case SCANCODE_8: register_char('8'); break;
+    case SCANCODE_9: register_char('9'); break;
+    case SCANCODE_A: register_char('a'); break;
+    case SCANCODE_B: register_char('b'); break;
+    case SCANCODE_C: register_char('c'); break;
+    case SCANCODE_D: register_char('d'); break;
+    case SCANCODE_E: register_char('e'); break;
+    case SCANCODE_F: register_char('f'); break;
+    case SCANCODE_G: register_char('g'); break;
+    case SCANCODE_H: register_char('h'); break;
+    case SCANCODE_I: register_char('i'); break;
+    case SCANCODE_J: register_char('j'); break;
+    case SCANCODE_K: register_char('k'); break;
+    case SCANCODE_L: register_char('l'); break;
+    case SCANCODE_M: register_char('m'); break;
+    case SCANCODE_N: register_char('n'); break;
+    case SCANCODE_O: register_char('o'); break;
+    case SCANCODE_P: register_char('p'); break;
+    case SCANCODE_Q: register_char('q'); break;
+    case SCANCODE_R: register_char('r'); break;
+    case SCANCODE_S: register_char('s'); break;
+    case SCANCODE_T: register_char('t'); break;
+    case SCANCODE_U: register_char('u'); break;
+    case SCANCODE_V: register_char('v'); break;
+    case SCANCODE_W: register_char('w'); break;
+    case SCANCODE_X: register_char('x'); break;
+    case SCANCODE_Y: register_char('y'); break;
+    case SCANCODE_Z: register_char('z'); break;
+    case SCANCODE_PLUS: register_char('+'); break;
+    case SCANCODE_MINUS: register_char('-'); break;
+    case SCANCODE_SEMI: register_char(';'); break;
+    case SCANCODE_LSQB: register_char('['); break;
+    case SCANCODE_RSQB: register_char(']'); break;
+    case SCANCODE_COMMA: register_char(','); break;
+    case SCANCODE_DOT: register_char('.'); break;
+    case SCANCODE_SLASH: register_char('/'); break;
+    case SCANCODE_STAR: register_char('*'); break;
+    case SCANCODE_QUOT: register_char('\''); break;
+    case SCANCODE_BTCK: register_char('`'); break;
+    case SCANCODE_BSLASH: register_char('\\'); break;
+    case SCANCODE_SPACE: register_char(' '); break;
+    case SCANCODE_TAB: register_char('\t'); break;
+    case SCANCODE_ENTER: register_char('\n'); break;
+
     case SCANCODE_BSPACE: print("BACKSPACE"); break;
     case SCANCODE_CLOCK: print("CAPS LOCK"); break;
     case SCANCODE_ESC: print("ESC"); break;
@@ -176,7 +221,7 @@ void print_keyname(uint8_t scancode) {
 
   if(done) return;
 
-  if(kb_state & MASK_SPECIAL) {
+  if(IS_SPECIAL_SET) {
     done = 1;
     switch(scancode) {
       case SCANCODE_SUPER: print("SUPER"); break;
@@ -189,43 +234,50 @@ void print_keyname(uint8_t scancode) {
   }
 }
 
+void unset_special() {
+  if(IS_SPECIAL_SET) kb_state -= MASK_SPECIAL;
+}
+
 void handle_kb() {
   uint8_t scancode = port_byte_in(KB_PORT_IN);
-  char done = 1;
 
+  // Some keys have a 2 byte scancode that are sent separately.
+  // We can identify this by the first byte which is always the same.
+  // If this is the case, set a flag.
+  if(scancode == SCANCODE_SPECIAL) {
+    if(!IS_SPECIAL_SET) kb_state += MASK_SPECIAL;
+    return;
+  } 
+
+  char done = 1;
   switch(scancode) {
     case SCANCODE_LSHIFT:
     case SCANCODE_RSHIFT:
-      if(!(kb_state & MASK_SHIFT)) kb_state += MASK_SHIFT;
+      if(!IS_SHIFT_SET) kb_state += MASK_SHIFT;
       break;
-    case SCANCODE_LSHIFT + 0x80:
-    case SCANCODE_RSHIFT + 0x80:
-      if(kb_state & MASK_SHIFT) kb_state -= MASK_SHIFT;
+    case SCANCODE_LSHIFT + KEYUP_OFFSET:
+    case SCANCODE_RSHIFT + KEYUP_OFFSET:
+      if(IS_SHIFT_SET) kb_state -= MASK_SHIFT;
       break;
     case SCANCODE_LCTRL:
-      if(!(kb_state & MASK_CTRL)) kb_state += MASK_CTRL;
+      if(!IS_CTRL_SET) kb_state += MASK_CTRL;
       break;
-    case SCANCODE_LCTRL + 0x80:
-      if(kb_state & MASK_CTRL) kb_state -= MASK_CTRL;
-      break;
-    case SCANCODE_SPECIAL:
-      if(!(kb_state & MASK_SPECIAL)) kb_state += MASK_SPECIAL;
-      break;
-    case SCANCODE_SPECIAL + 0x80:
-      if(kb_state & MASK_SPECIAL) kb_state -= MASK_SPECIAL;
+    case SCANCODE_LCTRL + KEYUP_OFFSET:
+      if(IS_CTRL_SET) kb_state -= MASK_CTRL;
       break;
     default: done = 0;
       break;
   }
-  // print_byte(scancode);
 
-  if(done) return;
-
-  if(scancode < 0x80) {
-    print_keyname(scancode);
-  } else {
-    print("^");
-    print_keyname(scancode - 0x80); // key up is key down + 0x80
+  if(done) {
+    unset_special();
+    return;
   }
+
+  if(scancode < KEYUP_OFFSET) {
+    process_scancode(scancode);
+  }
+
+  unset_special();
 }
 

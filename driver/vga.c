@@ -52,44 +52,42 @@ void memdump(const void* address, uint32_t length) {
   }
 }
 
-void newline() {
-  short cursor = get_cursor();
-  set_cursor(cursor + (VGA_COLS - (cursor % VGA_COLS)));
-}
-
 void* print_addr(void* ptr) {
   memdump(&ptr, 4);
   return ptr;
 }
 
-void print(char* text) {
-  char color = 0xE1;
+void printch(char ch) {
   short cursor = get_cursor();
   char* video_mem = (char*) VIDEO_MEM_ADDR;
 
-  short i = 0;
-  for(; text[i] != 0; i++) {
-    video_mem[cursor * 2 + i * 2] = text[i];
-    video_mem[cursor * 2 + i * 2 + 1] = color;
+  if(ch == '\n') {
+    set_cursor(cursor + VGA_COLS - (cursor % VGA_COLS));
+  } else {
+    video_mem[cursor * 2] = ch;
+    video_mem[cursor * 2 + 1] = DEFAULT_COLOR;
+    set_cursor(cursor + 1);
   }
-
-  set_cursor(cursor + i);
 }
 
-void println(char* text) {
-  char color = 0xE1;
+void print(char* text) {
   short cursor = get_cursor();
   char* video_mem = (char*) VIDEO_MEM_ADDR;
 
   short i = 0;
+  short nl = 0;
+
   for(; text[i] != 0; i++) {
-    video_mem[cursor * 2 + i * 2] = text[i];
-    video_mem[cursor * 2 + i * 2 + 1] = color;
+    short cur = cursor + i + nl;
+
+    if(text[i] == '\n') {
+      nl += (VGA_COLS - (cur % VGA_COLS) - 1); 
+    } else {
+      video_mem[cur * 2] = text[i];
+      video_mem[cur * 2 + 1] = DEFAULT_COLOR;
+    }
   }
 
-  short new_cursor = cursor + i - 1;
-
-  if(new_cursor % VGA_COLS == 0) set_cursor(cursor + i - 1);
-  else newline();
+  set_cursor(cursor + i + nl);
 }
 
