@@ -22,7 +22,7 @@ $(ODIR)kernel.bin: $(ODIR)kernel-entry.o $(ODIR)kernel.o $(ODIR)ioport.o $(ODIR)
     $(ODIR)vga.o $(ODIR)keyboard.o
 	ld -m elf_i386 --oformat binary -Ttext 0x10000 -o $@ $^
 
-$(ODIR)kernel-entry.o: boot/kernel-entry.asm
+$(ODIR)kernel-entry.o: kernel/kernel-entry.asm
 	nasm -f elf -o $@ $<
 
 $(ODIR)kernel.o: kernel/kernel.c
