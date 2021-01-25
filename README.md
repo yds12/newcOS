@@ -1,5 +1,4 @@
-Toy OS for learning purposes. Named after 
-[Newton da Costa](https://en.wikipedia.org/wiki/Newton_da_Costa).
+Toy OS for learning purposes.
 
 # Running
 
@@ -13,5 +12,22 @@ Then run:
 
 For now you should see a message from our kernel.
 
-![NewcOS screenshot](/docs/screenshot.png?raw=true)
+![NewcOS screenshot](/doc/screenshot.png?raw=true)
+
+# Current State
+
+We have so far:
+
+* Bootloader
+
+* Interrupt handling
+
+* VGA driver
+
+* Keyboard driver (almost done)
+
+---
+
+Named after
+[Newton da Costa](https://en.wikipedia.org/wiki/Newton_da_Costa).
 
