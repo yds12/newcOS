@@ -18,11 +18,11 @@ $(ODIR)newcos: $(ODIR)boot.bin $(ODIR)kernel.bin
 $(ODIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
 	nasm -f bin -o $@ $<
 
-$(ODIR)kernel.bin: $(ODIR)kernel-entry.o $(ODIR)kernel.o $(ODIR)ioport.o $(ODIR)interrupt.o \
+$(ODIR)kernel.bin: $(ODIR)entry.o $(ODIR)kernel.o $(ODIR)ioport.o $(ODIR)interrupt.o \
     $(ODIR)vga.o $(ODIR)keyboard.o
 	ld -m elf_i386 --oformat binary -Ttext 0x10000 -o $@ $^
 
-$(ODIR)kernel-entry.o: kernel/kernel-entry.asm
+$(ODIR)entry.o: kernel/entry.asm
 	nasm -f elf -o $@ $<
 
 $(ODIR)kernel.o: kernel/kernel.c

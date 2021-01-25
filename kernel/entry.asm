@@ -8,5 +8,6 @@ jmp $
 
 ; some initialization required by the kernel
 ; such as interrupt handlers, etc.
-%include "kernel/init.asm"
+%include "kernel/isr.asm"
+%include "kernel/irq.asm"
 
