@@ -109,7 +109,7 @@ void init_kb() {
 }
 
 void register_char(char ch) {
-//  printch(ch);
+  printch(ch);
 }
 
 void process_scancode(uint8_t scancode) {
@@ -278,7 +278,7 @@ void unset_special() {
 
 void handle_kb() {
   uint8_t scancode = port_byte_in(KB_PORT_IN);
-  print_byte(scancode);
+//  print_byte(scancode);
 
   // Some keys have a 2 byte scancode that are sent separately.
   // We can identify this by the first byte which is always the same.
