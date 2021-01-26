@@ -23,7 +23,7 @@
 #define SCANCODE_9 0xA
 #define SCANCODE_0 0xB
 #define SCANCODE_MINUS 0xC
-#define SCANCODE_PLUS 0xD
+#define SCANCODE_EQ 0xD
 #define SCANCODE_BSPACE 0xE
 #define SCANCODE_TAB 0xF
 #define SCANCODE_Q 0x10
@@ -79,15 +79,23 @@
 #define SCANCODE_F8 0x42
 #define SCANCODE_F9 0x43
 #define SCANCODE_F10 0x44
+#define SCANCODE_SCRLCK 0x46
+#define SCANCODE_LBSLASH 0x56
 #define SCANCODE_F11 0x57
 #define SCANCODE_F12 0x58
-#define SCANCODE_LEFT 0x4B
-#define SCANCODE_UP 0x48
-#define SCANCODE_RIGHT 0x4D
-#define SCANCODE_DOWN 0x50
-#define SCANCODE_SUPER 0x5B
 
 #define SCANCODE_SPECIAL 0xE0 // special keys, need to read next
+#define SCANCODE_HOME 0x47
+#define SCANCODE_UP 0x48
+#define SCANCODE_PGUP 0x49
+#define SCANCODE_LEFT 0x4B
+#define SCANCODE_RIGHT 0x4D
+#define SCANCODE_END 0x4F
+#define SCANCODE_DOWN 0x50
+#define SCANCODE_PGDW 0x51
+#define SCANCODE_INS 0x52
+#define SCANCODE_DEL 0x53
+#define SCANCODE_SUPER 0x5B
 
 #define MASK_SHIFT 0x01
 #define MASK_CTRL 0x02
@@ -101,7 +109,7 @@ void init_kb() {
 }
 
 void register_char(char ch) {
-  printch(ch);
+//  printch(ch);
 }
 
 void process_scancode(uint8_t scancode) {
@@ -135,6 +143,28 @@ void process_scancode(uint8_t scancode) {
       case SCANCODE_X: register_char('X'); break;
       case SCANCODE_Y: register_char('Y'); break;
       case SCANCODE_Z: register_char('Z'); break;
+      case SCANCODE_0: register_char(')'); break;
+      case SCANCODE_1: register_char('!'); break;
+      case SCANCODE_2: register_char('@'); break;
+      case SCANCODE_3: register_char('#'); break;
+      case SCANCODE_4: register_char('$'); break;
+      case SCANCODE_5: register_char('%'); break;
+      case SCANCODE_6: register_char('^'); break;
+      case SCANCODE_7: register_char('&'); break;
+      case SCANCODE_8: register_char('*'); break;
+      case SCANCODE_9: register_char('('); break;
+      case SCANCODE_EQ: register_char('+'); break;
+      case SCANCODE_MINUS: register_char('_'); break;
+      case SCANCODE_SEMI: register_char(':'); break;
+      case SCANCODE_LSQB: register_char('{'); break;
+      case SCANCODE_RSQB: register_char('}'); break;
+      case SCANCODE_COMMA: register_char('<'); break;
+      case SCANCODE_DOT: register_char('>'); break;
+      case SCANCODE_SLASH: register_char('?'); break;
+      case SCANCODE_QUOT: register_char('"'); break;
+      case SCANCODE_BTCK: register_char('~'); break;
+      case SCANCODE_BSLASH: register_char('|'); break;
+      case SCANCODE_LBSLASH: register_char('|'); break;
       default: done = 0;
         break;
     }
@@ -181,7 +211,7 @@ void process_scancode(uint8_t scancode) {
     case SCANCODE_X: register_char('x'); break;
     case SCANCODE_Y: register_char('y'); break;
     case SCANCODE_Z: register_char('z'); break;
-    case SCANCODE_PLUS: register_char('+'); break;
+    case SCANCODE_EQ: register_char('='); break;
     case SCANCODE_MINUS: register_char('-'); break;
     case SCANCODE_SEMI: register_char(';'); break;
     case SCANCODE_LSQB: register_char('['); break;
@@ -193,6 +223,7 @@ void process_scancode(uint8_t scancode) {
     case SCANCODE_QUOT: register_char('\''); break;
     case SCANCODE_BTCK: register_char('`'); break;
     case SCANCODE_BSLASH: register_char('\\'); break;
+    case SCANCODE_LBSLASH: register_char('\\'); break;
     case SCANCODE_SPACE: register_char(' '); break;
     case SCANCODE_TAB: register_char('\t'); break;
     case SCANCODE_ENTER: register_char('\n'); break;
@@ -216,6 +247,7 @@ void process_scancode(uint8_t scancode) {
     case SCANCODE_F10: print("F10"); break;
     case SCANCODE_F11: print("F11"); break;
     case SCANCODE_F12: print("F12"); break;
+    case SCANCODE_SCRLCK: print("SCROLL LOCK"); break;
     default: done = 0; break;
   }
 
@@ -229,6 +261,12 @@ void process_scancode(uint8_t scancode) {
       case SCANCODE_LEFT: print("LEFT"); break;
       case SCANCODE_RIGHT: print("RIGHT"); break;
       case SCANCODE_DOWN: print("DOWN"); break;
+      case SCANCODE_DEL: print("DELETE"); break;
+      case SCANCODE_HOME: print("HOME"); break;
+      case SCANCODE_PGUP: print("PAGE UP"); break;
+      case SCANCODE_PGDW: print("PAGE DOWN"); break;
+      case SCANCODE_END: print("END"); break;
+      case SCANCODE_INS: print("INSERT"); break;
       default: done = 0; break;
     }
   }
@@ -240,6 +278,7 @@ void unset_special() {
 
 void handle_kb() {
   uint8_t scancode = port_byte_in(KB_PORT_IN);
+  print_byte(scancode);
 
   // Some keys have a 2 byte scancode that are sent separately.
   // We can identify this by the first byte which is always the same.
