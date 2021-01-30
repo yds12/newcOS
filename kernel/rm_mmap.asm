@@ -40,7 +40,7 @@ bits 16
 
   ; Memory Mapping function
   ; ...
-  ;mov [MEMTAB], word 0xCCDD
+  mov [MEMTAB], word 0xCCDD
 
   ; Now we need to re-enter protected mode
   ; disable BIOS interrupts
