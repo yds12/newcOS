@@ -3,8 +3,16 @@
 #include "driver/keyboard.h"
 #include "kernel/interrupt.h"
 
+extern void* rm_mmap();
+
 void kmain() {
-  print("> Hello from NewcOS kernel!\n");
+  print("> NewcOS kernel started!\n");
+  void* memtable = rm_mmap();
+  print("> Memory map done.\n");
+  print("> Results in: ");
+  print_addr(memtable);
+  print("\n");
+  memdump(memtable, 512);
 
   idt_setup();
   asm volatile("sti");  // enable external interrupts
