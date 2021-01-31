@@ -19,13 +19,10 @@ $(ODIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
 	nasm -f bin -o $@ $<
 
 $(ODIR)kernel.bin: $(ODIR)entry.o $(ODIR)kernel.o $(ODIR)ioport.o $(ODIR)interrupt.o \
-    $(ODIR)vga.o $(ODIR)keyboard.o $(ODIR)rm_mmap.o
-	ld -m elf_i386 --oformat binary -Ttext 0x10000 -Tbss 0x10000 -o $@ $^
+    $(ODIR)vga.o $(ODIR)keyboard.o
+	ld -m elf_i386 --oformat binary -Ttext 0x10000 -Tbss 0xFA00 -o $@ $^
 
 $(ODIR)entry.o: kernel/entry.asm
-	nasm -f elf -o $@ $<
-
-$(ODIR)rm_mmap.o: kernel/rm_mmap.asm
 	nasm -f elf -o $@ $<
 
 $(ODIR)kernel.o: kernel/kernel.c

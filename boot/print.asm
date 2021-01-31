@@ -12,10 +12,12 @@ print:
   ret
 
 msg_hello: db "> NewcOS booting...", 0x0a, 0x0d, 0
-msg_disk_reset_err: db "> Error reseting disk.", 0x0a, 0x0d, 0
-msg_disk_reset_ok: db "> Disk successfully reset.", 0x0a, 0x0d, 0
-msg_disk_err: db "> Disk error.", 0x0a, 0x0d, 0
-msg_disk_amount_err: db "> Could not read all required sectors.", 0x0a, 0x0d, 0
-msg_disk_read_ok: db "> Disk successfully read.", 0x0a, 0x0d, 0
+msg_disk_reset_err: db "> Disk reset err.", 0x0a, 0x0d, 0
+msg_disk_reset_ok: db "> Disk reset OK.", 0x0a, 0x0d, 0
+msg_disk_err: db "> Disk err.", 0x0a, 0x0d, 0
+msg_disk_amount_err: db "> Num sectors read err.", 0x0a, 0x0d, 0
+msg_disk_read_ok: db "> Disk read OK.", 0x0a, 0x0d, 0
+msg_mmap_err: db "> MMAP err.", 0x0a, 0x0d, 0
+msg_mmap_ok: db "> MMAP OK.", 0x0a, 0x0d, 0
 end_print:
 

@@ -26,6 +26,9 @@ call print
 ; the working directory (from where we called nasm)
 %include "boot/disk.asm"
 
+; Perform memory mapping
+%include "boot/rm_mmap.asm"
+
 call prepare32
 jmp $ ; infinite loop
 

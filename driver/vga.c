@@ -52,8 +52,14 @@ void memdump(const void* address, uint32_t length) {
   }
 }
 
-void* print_addr(void* ptr) {
-  memdump(&ptr, 4);
+void* print_addr(const void* ptr) {
+  print_byte(((uint8_t*) &ptr)[3]);
+  print_byte(((uint8_t*) &ptr)[2]);
+  print(" ");
+  print_byte(((uint8_t*) &ptr)[1]);
+  print_byte(((uint8_t*) &ptr)[0]);
+  set_cursor(get_cursor() + 9);
+  //memdump(&ptr, 4);
   return ptr;
 }
 
