@@ -44,6 +44,19 @@ void print_byte(uint8_t byte) {
   set_cursor(cursor + 2);
 }
 
+void print_int32(uint32_t num) {
+  print_byte((uint8_t) (num >> 24));
+  print_byte((uint8_t) ((num >> 16) & 0xFF));
+  print_byte((uint8_t) ((num >> 8) & 0xFF));
+  print_byte((uint8_t) (num & 0xFF));
+}
+
+void print_int64(uint64_t num) {
+  print_int32((uint32_t) (num >> 32));
+  print(" ");
+  print_int32((uint32_t) (num & 0xFFFFFFFF));
+}
+
 void memdump(const void* address, uint32_t length) {
   for(int i = 0; i < length; i++) {
     print_byte(((uint8_t*) address)[i]);
@@ -58,8 +71,6 @@ void* print_addr(const void* ptr) {
   print(" ");
   print_byte(((uint8_t*) &ptr)[1]);
   print_byte(((uint8_t*) &ptr)[0]);
-  set_cursor(get_cursor() + 9);
-  //memdump(&ptr, 4);
   return ptr;
 }
 
