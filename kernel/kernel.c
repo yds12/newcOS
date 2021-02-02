@@ -8,7 +8,7 @@ extern void* rm_mmap();
 
 void kmain() {
   print("> NewcOS kernel started!\n");
-  void* memtable = 0xC004;
+  void* memtable = (void*) 0xC004;
   print("> Memory map in: ");
   print_addr(memtable);
   print("\n");

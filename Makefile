@@ -9,7 +9,7 @@ CFLAGS = -m32 -fno-pic -ffreestanding -I include
 
 # -d guest_errors,int
 run: $(ODIR)newcos
-	$(QEMU) -drive format=raw,file=$<
+	$(QEMU) -m 256M -drive format=raw,file=$<
 
 $(ODIR)newcos: $(ODIR)boot.bin $(ODIR)kernel.bin
 	cat $^ > $@

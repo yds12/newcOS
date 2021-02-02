@@ -1,5 +1,5 @@
 #include "kernel/mmap.h"
-#include "driver/keyboard.h"
+#include "driver/vga.h"
 
 #define MAX_MMAP_ENTRIES 20
 
@@ -16,6 +16,10 @@ void load_bios_mmap(void* addr) {
     }
   }
 
+  uint64_t mem_total = 0;
+  uint64_t mem_usable = 0;
+  uint64_t mem_reserved = 0;
+
   for(int i = 0; i < nentries; i++) {
     bios_mmap_entry entry = entries[i];
     print("Entry ");
@@ -25,16 +29,31 @@ void load_bios_mmap(void* addr) {
     print(")");
     print(", len (");
     print_int64(entry.length);
-    print(")");
-    print(", type (");
+    print("), ");
 
-    if(entry.type == 1) print("usable");
-    else if(entry.type == 2) print("reserved");
-    print(")");
+    if(entry.type == 1) {
+      print("usable");
+      mem_usable += entry.length;
+    } else if(entry.type == 2) {
+      print("reserved");
+      mem_reserved += entry.length;
+    }
     //print(", ext (");
     //print_int32(entry.extended_attrs);
     //print(")"); 
     print("\n");
+
+    mem_total += entry.length;
   }
+
+  print("reserved memory: ");
+  print_int64(mem_reserved);
+  print("\n");
+  print("usable memory:   ");
+  print_int64(mem_usable);
+  print("\n");
+  print("total memory:    ");
+  print_int64(mem_total);
+  print("\n");
 }
 
