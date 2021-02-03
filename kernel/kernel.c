@@ -3,6 +3,7 @@
 #include "driver/keyboard.h"
 #include "kernel/interrupt.h"
 #include "kernel/mmap.h"
+#include "kernel/vmm.h"
 
 extern void* rm_mmap();
 
@@ -18,6 +19,7 @@ void kmain() {
   idt_setup();
   asm volatile("sti");  // enable external interrupts
   init_kb();
+  vmm_init();
   while(1) asm("hlt");
 }
 

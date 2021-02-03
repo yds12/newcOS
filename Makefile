@@ -19,11 +19,14 @@ $(ODIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
 	nasm -f bin -o $@ $<
 
 $(ODIR)kernel.bin: $(ODIR)entry.o $(ODIR)kernel.o $(ODIR)ioport.o $(ODIR)interrupt.o \
-    $(ODIR)vga.o $(ODIR)keyboard.o $(ODIR)mmap.o
-	ld -m elf_i386 --oformat binary -Ttext 0x10000 -Tbss 0xFA00 -o $@ $^
+    $(ODIR)vga.o $(ODIR)keyboard.o $(ODIR)mmap.o $(ODIR)paging.o $(ODIR)vmm.o
+	ld -m elf_i386 --oformat binary -Ttext 0x10000 -Tbss 0xCA00 -o $@ $^
 
 $(ODIR)entry.o: kernel/entry.asm
-	nasm -f elf -o $@ $<
+	nasm -f elf32 -o $@ $<
+
+$(ODIR)paging.o: kernel/paging.asm
+	nasm -f elf32 -o $@ $<
 
 $(ODIR)kernel.o: kernel/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -32,6 +35,9 @@ $(ODIR)interrupt.o: kernel/interrupt.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(ODIR)mmap.o: kernel/mmap.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(ODIR)vmm.o: kernel/vmm.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(ODIR)ioport.o: driver/ioport.c

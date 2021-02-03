@@ -1,0 +1,2 @@
+void vmm_init();
+
