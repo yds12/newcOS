@@ -20,7 +20,7 @@ $(ODIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
 
 $(ODIR)kernel.bin: $(ODIR)entry.o $(ODIR)kernel.o $(ODIR)ioport.o $(ODIR)interrupt.o \
     $(ODIR)vga.o $(ODIR)keyboard.o $(ODIR)mmap.o $(ODIR)paging.o $(ODIR)vmm.o
-	ld -m elf_i386 --oformat binary -Ttext 0x10000 -Tbss 0xCA00 -o $@ $^
+	ld -m elf_i386 --oformat binary -Ttext 0x10000 -o $@ $^
 
 $(ODIR)entry.o: kernel/entry.asm
 	nasm -f elf32 -o $@ $<
