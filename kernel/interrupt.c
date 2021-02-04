@@ -21,8 +21,14 @@ idt_gate idt[IDT_ENTRIES];
 idt_register idt_reg;
 
 void isr_handler(registers* r) {
-  print("ISR handler:\n");
-  print_byte((uint8_t) r->int_num);
+  print("ISR handler: ");
+
+  if((uint8_t) r->int_num == 14) {
+    print("page fault");
+  } else {
+    print_byte((uint8_t) r->int_num);
+  }
+  print("\n");
 }
 
 void irq_handler(registers* r) {
