@@ -46,7 +46,7 @@ void isr_handler(registers* r) {
     default:
       if(intn == 0xF || (intn >= 0x13 && intn <= 0x1F)) {
         print("reserved");
-      else {
+      } else {
         print_byte((uint8_t) intn); break;
       }
   }
