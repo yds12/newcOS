@@ -21,13 +21,36 @@ idt_gate idt[IDT_ENTRIES];
 idt_register idt_reg;
 
 void isr_handler(registers* r) {
+  uint32_t intn = r->int_num;
   print("ISR handler: ");
 
-  if((uint8_t) r->int_num == 14) {
-    print("page fault");
-  } else {
-    print_byte((uint8_t) r->int_num);
+  switch(intn) {
+    case 0x0: print("divide by zero"); break;
+    case 0x1: print("single step trace"); break;
+    case 0x2: print("NMI power failure"); break;
+    case 0x3: print("breakpoint"); break;
+    case 0x4: print("numeric overflow"); break;
+    case 0x5: print("screen dump to printer"); break;
+    case 0x6: print("invalid instruction"); break;
+    case 0x7: print("no coprocessor"); break;
+    case 0x8: print("double fault"); break;
+    case 0x9: print("coprocessor segment overrun"); break;
+    case 0xA: print("invalid task state segment TSS"); break;
+    case 0xB: print("segment not present"); break;
+    case 0xC: print("stack segment overrun"); break;
+    case 0xD: print("general protection fault GPF"); break;
+    case 0xE: print("page fault"); break;
+    case 0x10: print("coprocessor error"); break;
+    case 0x11: print("alignment check"); break;
+    case 0x12: print("machine check"); break;
+    default:
+      if(intn == 0xF || (intn >= 0x13 && intn <= 0x1F)) {
+        print("reserved");
+      else {
+        print_byte((uint8_t) intn); break;
+      }
   }
+
   print("\n");
 }
 
