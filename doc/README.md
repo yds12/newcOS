@@ -66,3 +66,32 @@ fetched by the CPU (thanks to the segment registers and our configuration of the
 In order to do this, we must carefully lay this data out in our bootloader and then ask the CPU to
 load it with the instruction `lgdt` (load GDT).
 
+## Entering Protected Mode
+
+After loading the GDT, we need to enter 32-bit protected mode before handing control to the kernel.
+
+In order to do this, we set the lowest bit of the `cr0` register and then make a "long jump"
+(a jump specifying a segmented address). The destination of the jump should be assembled in 32-bit mode
+(`bits 32` nasm directive). Next, we need to update all segment registers to point to
+the offset of the data segment in the GDT.
+
+After that, we setup another stack, that will be used by the kernel. Now we are ready to call the
+kernel entry point. This address will be the same where we loaded the kernel in memory previously.
+
+## Notes about how to Build the Kernel
+
+Since we are writing the kernel in C and we don't link our kernel together with the boot binary, it is
+difficult to know where the kernel `main` function will be placed. For that reason, it is
+easier to setup an assembly file ([`kernel/entry.asm`](../kernel/entry.asm)) that will be placed
+in the first address of the binary, and whose only job is to call the kernel main function.
+This assembly file generates an object that will be linked against the kernel object, so it can easily
+find the `main` function. We also have to instruct the linker to set a fixed offset for the kernel
+binary (`-Ttext 0x10000`), so that we have a known address to call it from the bootloader.
+
+The final OS image is built by concatenating (`cat`) the bootloader with the kernel binary, and then
+truncating it to a fixed larger size so that we can read it more easily from disk as shown above.
+If our image is smaller than the number of sectors specified to be read (at least in qemu) we will get
+an error.
+
+Take a look at the [`Makefile`](../Makefile) to see how we build the kernel binary.
+

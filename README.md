@@ -1,5 +1,7 @@
 Toy OS for learning purposes.
 
+We document the process [here](/doc/README.md).
+
 # Running
 
 You need a Linux machine with `nasm`, `qemu` and `make` installed.
@@ -10,7 +12,8 @@ Then run:
 
     $ make
 
-For now you should see a message from our kernel.
+For now you should see a hello message from our kernel, a memory mapping and
+the total memory size, plus some other logs.
 
 ![NewcOS screenshot](/doc/screenshot.png?raw=true)
 
@@ -20,11 +23,15 @@ We have so far:
 
 * Bootloader
 
+* Memory mapping via BIOS
+
 * Interrupt handling
 
 * VGA driver
 
-* Keyboard driver (almost done)
+* Keyboard driver
+
+* Virtual Memory/Paging (very basic so far)
 
 ---
 
