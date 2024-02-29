@@ -25,7 +25,7 @@ short get_cursor() {
   return offset;
 }
 
-int strlen(char* text) {
+long unsigned int strlen(char* text) {
   int len = 0;
 
   while(text[len] != 0) len++;
@@ -58,14 +58,14 @@ void print_int64(uint64_t num) {
 }
 
 void memdump(const void* address, uint32_t length) {
-  for(int i = 0; i < length; i++) {
+  for(unsigned int i = 0; i < length; i++) {
     print_byte(((uint8_t*) address)[i]);
 
     if(i % 2 == 1) set_cursor(get_cursor() + 1);
   }
 }
 
-void* print_addr(const void* ptr) {
+const void* print_addr(const void* ptr) {
   print_byte(((uint8_t*) &ptr)[3]);
   print_byte(((uint8_t*) &ptr)[2]);
   print(" ");

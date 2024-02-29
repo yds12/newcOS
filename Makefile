@@ -1,54 +1,57 @@
+# Makefile help:
+#
 # $@ means the target file (the rule name)
 # $< means the first dependency (after the rule name)
 # $^ means all dependencies
+# := assigns immediately at the start, and = assigns lazily
 
-ODIR = build/
-QEMU = qemu-system-x86_64
-CC = gcc
-CFLAGS = -m32 -fno-pic -ffreestanding -I include
+CC:=gcc
+AS:=nasm
+LINKER:=ld
+QEMU:=qemu-system-x86_64
+CFLAGS:=-m32 -fno-pic -ffreestanding -I include -Wall -Wextra -Wpedantic -Werror
+
+BUILD_DIR:=build
+KERNEL_DIR:=kernel
+KERNEL_C:=$(wildcard $(KERNEL_DIR)/*.c)
+KERNEL_C_OBJ:=$(patsubst $(KERNEL_DIR)/%.c,$(BUILD_DIR)/%.o, $(KERNEL_C))
+KERNEL_ASM:=$(KERNEL_DIR)/entry.asm $(KERNEL_DIR)/paging.asm
+KERNEL_ASM_OBJ:=$(patsubst $(KERNEL_DIR)/%.asm,$(BUILD_DIR)/%.o, $(KERNEL_ASM))
+DRIVER_DIR:=driver
+DRIVER_C:=$(wildcard $(DRIVER_DIR)/*.c)
+DRIVER_OBJ:=$(patsubst $(DRIVER_DIR)/%.c,$(BUILD_DIR)/%.o, $(DRIVER_C))
+OBJS:=$(KERNEL_C_OBJ) $(KERNEL_ASM_OBJ) $(DRIVER_OBJ)
+BOOT_ASM:=$(wildcard boot/*.asm)
+OS_IMG:=$(BUILD_DIR)/newcos
 
 # -d guest_errors,int
-run: $(ODIR)newcos
+run: $(OS_IMG)
 	$(QEMU) -m 256M -drive format=raw,file=$<
 
-$(ODIR)newcos: $(ODIR)boot.bin $(ODIR)kernel.bin
+$(OS_IMG): $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin
 	cat $^ > $@
-	truncate -s 48K $(ODIR)newcos
+	truncate -s 48K $(OS_IMG)
 
-$(ODIR)boot.bin: boot/boot.asm boot/disk.asm boot/gdt.asm boot/print.asm
-	nasm -f bin -o $@ $<
+$(BUILD_DIR)/boot.bin: $(BOOT_ASM)
+	$(AS) -f bin -o $@ $<
 
-$(ODIR)kernel.bin: $(ODIR)entry.o $(ODIR)kernel.o $(ODIR)ioport.o $(ODIR)interrupt.o \
-    $(ODIR)vga.o $(ODIR)keyboard.o $(ODIR)mmap.o $(ODIR)paging.o $(ODIR)vmm.o
-	ld -m elf_i386 --oformat binary -Ttext 0x10000 -o $@ $^
+$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/entry.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/ioport.o $(BUILD_DIR)/interrupt.o \
+    $(BUILD_DIR)/vga.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/mmap.o $(BUILD_DIR)/paging.o $(BUILD_DIR)/vmm.o
+	$(LINKER) -m elf_i386 --oformat binary -Ttext 0x10000 -o $@ $^
 
-$(ODIR)entry.o: kernel/entry.asm
-	nasm -f elf32 -o $@ $<
+# TODO why is this not working?
+# $(BUILD_DIR)/kernel.bin: $(OBJS)
+# 	$(LINKER) -m elf_i386 --oformat binary -Ttext 0x10000 -o $@ $^
 
-$(ODIR)paging.o: kernel/paging.asm
-	nasm -f elf32 -o $@ $<
+$(KERNEL_ASM_OBJ): $(BUILD_DIR)/%.o: $(KERNEL_DIR)/%.asm
+	$(AS) -f elf32 -o $@ $<
 
-$(ODIR)kernel.o: kernel/kernel.c
+$(KERNEL_C_OBJ): $(BUILD_DIR)/%.o: $(KERNEL_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(ODIR)interrupt.o: kernel/interrupt.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(ODIR)mmap.o: kernel/mmap.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(ODIR)vmm.o: kernel/vmm.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(ODIR)ioport.o: driver/ioport.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(ODIR)vga.o: driver/vga.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(ODIR)keyboard.o: driver/keyboard.c
+$(DRIVER_OBJ): $(BUILD_DIR)/%.o: $(DRIVER_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm build/*
+	rm -f $(BUILD_DIR)/*
 

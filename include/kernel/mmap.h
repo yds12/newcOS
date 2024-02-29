@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NEWCOS_KERNEL_MMAP_H
+#define NEWCOS_KERNEL_MMAP_H
 
 #include "util.h"
 
@@ -11,3 +12,4 @@ typedef struct st_bios_mmap_entry {
 
 void load_bios_mmap(void* addr);
 
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NEWCOS_KERNEL_INTERRUPT_H
+#define NEWCOS_KERNEL_INTERRUPT_H
 
 #include <stdint.h>
 
@@ -81,3 +82,4 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
+#endif

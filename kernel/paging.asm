@@ -1,8 +1,8 @@
 global load_page_dir
 global enable_paging
 
-# Loads the page directory
-# Parameter: address of the page directory (in the stack?)
+; Loads the page directory
+; Parameter: address of the page directory (in the stack?)
 load_page_dir:
   push ebp
   mov ebp, esp
@@ -12,7 +12,7 @@ load_page_dir:
   pop ebp
   ret
 
-# Enables paging in register cr0 by setting its 32th bit
+; Enables paging in register cr0 by setting its 32th bit
 enable_paging:
   push ebp
   mov ebp, esp
